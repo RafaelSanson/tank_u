@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "InputActionValue.h"
 #include "GameFramework/PlayerController.h"
 #include "tank_uPlayerController.generated.h"
 
@@ -41,6 +42,8 @@ protected:
 	virtual void SetupInputComponent() override;
 	
 	virtual void BeginPlay() override;
+	void OnTankMovement(const FInputActionValue& Value);
+	void OnTankTurnInPlaceTriggered(const FInputActionValue& Value);
 	void SetupActionBindings();
 
 	void OnTankShootAtPositionStarted();

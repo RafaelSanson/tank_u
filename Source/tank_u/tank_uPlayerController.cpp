@@ -29,12 +29,15 @@ void Atank_uPlayerController::BeginPlay()
 
 void Atank_uPlayerController::SetupActionBindings()
 {
-	// Set up action bindings
-	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent))
-	{
-		// Setup mouse input events
-		EnhancedInputComponent->BindAction(TankShootAtPositionAction, ETriggerEvent::Started, this, &Atank_uPlayerController::OnTankShootAtPositionStarted);
-	}
+	UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent);
+	if (EnhancedInputComponent == nullptr) return;
+
+	// Setup mouse input events
+	EnhancedInputComponent->BindAction(TankShootAtPositionAction, ETriggerEvent::Started, this, &Atank_uPlayerController::OnTankShootAtPositionStarted);
+
+	// Setup keyboard input events
+	EnhancedInputComponent->BindAction(TankMovementAction, ETriggerEvent::Triggered, this, &Atank_uPlayerController::OnTankMovement);
+	EnhancedInputComponent->BindAction(TankTurnInPlaceAction, ETriggerEvent::Triggered, this, &Atank_uPlayerController::OnTankTurnInPlaceTriggered);
 }
 
 void Atank_uPlayerController::SetupInputComponent()
@@ -45,14 +48,30 @@ void Atank_uPlayerController::SetupInputComponent()
 	SetupActionBindings();
 }
 
+void Atank_uPlayerController::OnTankMovement(const FInputActionValue& Value) 
+{
+	if (Atank_uCharacter* ControlledCharacter = Cast<Atank_uCharacter>(GetPawn()); ControlledCharacter != nullptr)
+	{
+		const FVector WorldDirection = ControlledCharacter->GetActorForwardVector();
+		ControlledCharacter->AddMovementInput(WorldDirection, Value.Get<float>(), false);
+	}
+}
+
+void Atank_uPlayerController::OnTankTurnInPlaceTriggered(const FInputActionValue& Value)
+{
+	if (Atank_uCharacter* ControlledCharacter = Cast<Atank_uCharacter>(GetPawn()); ControlledCharacter != nullptr)
+	{
+		const FVector WorldDirection = ControlledCharacter->GetActorForwardVector();
+		ControlledCharacter->AddActorLocalRotation(FRotator(0, Value.Get<float>() * GetWorld()->DeltaTimeSeconds * 100.f, false));
+	}
+}
+
 void Atank_uPlayerController::OnTankShootAtPositionStarted()
 {
-	// We look for the location in the world where the player has pressed the input
-	// If we hit a surface, cache the location
-	if (FHitResult Hit; GetHitResultUnderCursor(ECC_Visibility, true, Hit))
-	{
-		CachedDestination = Hit.Location;
-	}
+	FHitResult Hit;
+	if ( !GetHitResultUnderCursor(ECC_Visibility, true, Hit)) return;
+	
+	CachedDestination = Hit.Location;
 	
 	// Move towards mouse pointer or touch
 	if (Atank_uCharacter* ControlledCharacter = Cast<Atank_uCharacter>(GetPawn()); ControlledCharacter != nullptr)
@@ -61,5 +80,6 @@ void Atank_uPlayerController::OnTankShootAtPositionStarted()
 		ControlledCharacter->AddMovementInput(WorldDirection, 1.0, false);
 	}
 
-	UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, FXCursor, CachedDestination, FRotator::ZeroRotator, FVector(1.f, 1.f, 1.f), true, true, ENCPoolMethod::None, true);
+	//UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, FXCursor, CachedDestination, FRotator::ZeroRotator, FVector(1.f, 1.f, 1.f), true, true, ENCPoolMethod::None, true);
 }
+
