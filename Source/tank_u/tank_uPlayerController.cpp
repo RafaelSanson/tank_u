@@ -73,13 +73,11 @@ void Atank_uPlayerController::OnTankShootAtPositionStarted()
 	
 	CachedDestination = Hit.Location;
 	
-	// Move towards mouse pointer or touch
 	if (Atank_uCharacter* ControlledCharacter = Cast<Atank_uCharacter>(GetPawn()); ControlledCharacter != nullptr)
 	{
-		const FVector WorldDirection = (CachedDestination - ControlledCharacter->GetActorLocation()).GetSafeNormal();
-		ControlledCharacter->AddMovementInput(WorldDirection, 1.0, false);
+		ControlledCharacter->OnSetDestination(CachedDestination);
 	}
-
-	//UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, FXCursor, CachedDestination, FRotator::ZeroRotator, FVector(1.f, 1.f, 1.f), true, true, ENCPoolMethod::None, true);
+	
+	UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, FXCursor, CachedDestination, FRotator::ZeroRotator, FVector(1.f, 1.f, 1.f), true, true, ENCPoolMethod::None, true);
 }
 

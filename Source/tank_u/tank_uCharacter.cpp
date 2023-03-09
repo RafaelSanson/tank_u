@@ -49,3 +49,8 @@ void Atank_uCharacter::Tick(float DeltaSeconds)
 {
     Super::Tick(DeltaSeconds);
 }
+
+void Atank_uCharacter::OnSetDestination_Implementation(FVector position)
+{
+	
+}
