@@ -7,6 +7,7 @@
 #include "tank_uCharacter.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "Kismet/GameplayStatics.h"
 
 Atank_uPlayerController::Atank_uPlayerController()
 {
@@ -38,6 +39,7 @@ void Atank_uPlayerController::SetupActionBindings()
 	// Setup keyboard input events
 	EnhancedInputComponent->BindAction(TankMovementAction, ETriggerEvent::Triggered, this, &Atank_uPlayerController::OnTankMovement);
 	EnhancedInputComponent->BindAction(TankTurnInPlaceAction, ETriggerEvent::Triggered, this, &Atank_uPlayerController::OnTankTurnInPlaceTriggered);
+	EnhancedInputComponent->BindAction(QuitGame, ETriggerEvent::Started, this, &Atank_uPlayerController::OnQuitGame);
 }
 
 void Atank_uPlayerController::SetupInputComponent()
@@ -64,6 +66,11 @@ void Atank_uPlayerController::OnTankTurnInPlaceTriggered(const FInputActionValue
 		const FVector WorldDirection = ControlledCharacter->GetActorForwardVector();
 		ControlledCharacter->AddActorLocalRotation(FRotator(0, Value.Get<float>() * GetWorld()->DeltaTimeSeconds * 100.f, false));
 	}
+}
+
+void Atank_uPlayerController::OnQuitGame()
+{
+	FGenericPlatformMisc::RequestExit(false);
 }
 
 void Atank_uPlayerController::OnTankShootAtPositionStarted()

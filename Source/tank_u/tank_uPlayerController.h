@@ -36,6 +36,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
 	class UInputAction* TankTurnInPlaceAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
+	class UInputAction* QuitGame;
+
 	#pragma endregion 
 
 protected:
@@ -44,6 +47,7 @@ protected:
 	virtual void BeginPlay() override;
 	void OnTankMovement(const FInputActionValue& Value);
 	void OnTankTurnInPlaceTriggered(const FInputActionValue& Value);
+	void OnQuitGame();
 	void SetupActionBindings();
 
 	void OnTankShootAtPositionStarted();
